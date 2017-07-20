@@ -185,7 +185,6 @@ mapping = { "Americas\n":"Americas",
             "west":"West",
             "WEST":"West"}                  #Mapping for corrected names.
 def update_name(name, mapping):
-    map=''
     mapping.keys()
     for i in mapping.keys():                #Function to replace all instances of the occurrences of the odd street type
         name=re.sub('(?<![a-zA-Z0-9])(?<=''){}(?!\.)(?![a-zA-Z0-9\-])'.format(i),mapping[i],name) #in the street names.
