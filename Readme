@@ -1,2 +1,2 @@
 This is a project created for the Udacity Data Analysis Nanodegree where data is scraped from a 3gb OSM XML file from OpenStreetMaps.org,
-for New York, and cleaned so that street names match formats. This is then uploaded to a sql lite database.
+for New York, and cleaned so that street names match formats. This is then uploaded to a SQLite database.
