@@ -261,27 +261,32 @@ def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIE
     list1=['id','key','value','type']
     list2=['id','node_id','position']
     if element.tag == 'node':
-       node_attribs.update(element.attrib)
-       k=node_attribs.keys()
-       for i in k:
-           if i not in list:
-               del node_attribs[i]
-       for i in element.iter("tag"):                                   #Takes each element and grabs only the relevant
-           temp_dict=defaultdict()                                     #attributes for each type of tag in default dicts/
-           if i==None:                                                 #lists.
-               continue
-           elif ':' in i.attrib.get('k'):
-               temp_dict['id']=element.attrib.get('id')
-               temp_dict['type']=i.attrib.get('k').partition(':')[0]
-               temp_dict['key']=i.attrib.get('k').partition(':')[2]
-               temp_dict['value']=i.attrib.get('v')
-               tags.append(temp_dict)
-           else:
-               temp_dict['id']=element.attrib.get('id')
-               temp_dict['key']=i.attrib.get('k')
-               temp_dict['type']=default_tag_type
-               temp_dict['value']=i.attrib.get('v')
-               tags.append(temp_dict)
+        node_attribs.update(element.attrib)
+        k=node_attribs.keys()
+        for i in k:
+            if i not in list:
+                del node_attribs[i]
+        for i in element.iter("tag"):                                   #Takes each element and grabs only the relevant
+            temp_dict=defaultdict()                                     #attributes for each type of tag in default dicts/
+            if i==None:                                                 #lists.
+                continue
+            elif ':' in i.attrib.get('k'):
+                temp_dict['id']=element.attrib.get('id')
+                temp_dict['type']=i.attrib.get('k').partition(':')[0]
+                temp_dict['key']=i.attrib.get('k').partition(':')[2]
+                if is_street_name(i):
+                     temp_dict['value']=update_name(i.attrib.get('v'),mapping)
+                elif is_phone_number(i):
+                     temp_dict['value']=update_phone(i.attrib.get('v'))
+                else:
+                     temp_dict['value']=i.attrib.get('v')
+                tags.append(temp_dict)
+            else:
+                temp_dict['id']=element.attrib.get('id')
+                temp_dict['key']=i.attrib.get('k')
+                temp_dict['type']=default_tag_type
+                temp_dict['value']=i.attrib.get('v')
+                tags.append(temp_dict)
                
             
     elif element.tag == 'way':
@@ -305,13 +310,18 @@ def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIE
                 temp_dict['id']=element.attrib.get('id')
                 temp_dict['type']=i.attrib.get('k').partition(':')[0]
                 temp_dict['key']=i.attrib.get('k').partition(':')[2]
-                temp_dict['value']=i.attrib.get('v')
+                if is_street_name(i):
+                     temp_dict['value']=update_name(i.attrib.get('v'),mapping)
+                elif is_phone_number(i):
+                     temp_dict['value']=update_phone(i.attrib.get('v'))
+                else:
+                     temp_dict['value']=i.attrib.get('v')
                 tags.append(temp_dict)
             else:
                 temp_dict['id']=element.attrib.get('id')
                 temp_dict['key']=i.attrib.get('k')
                 temp_dict['type']=default_tag_type
-                temp_dict['value']=i.attrib.get('v')
+                temp_dict['value']=update_name(i.attrib.get('v'))
                 tags.append(temp_dict)
 
     
