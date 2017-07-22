@@ -98,6 +98,28 @@ with bz2.BZ2File(io.BytesIO(r.content)) as osm_file:
 with open('C://Users/Zohaib/Desktop/Lectures/Udacity/Streets.txt','w') as f:     #Print the street types to a file called 
     pprint.pprint(street_type,f)                                                 #Streets.txt to create the mapping dictionary.
 
+def is_phone_number(elem):
+    return (elem.attrib['k'] == "contact:phone")
+def audit_phone_number(phone_types, number):
+    if re.match("[0-9]{3}-[0-9]{3}-[0-9]{3}",number):
+        pass
+    else:
+        phone_types.append(number)
+def audit_phone(osm_file):
+    phone_types = []                                               #Function to parse the XMl document
+    for event, elem in et.iterparse(osm_file, events=("start",)):  #And use the other functions in conjuction
+        if elem.tag == "node" or elem.tag == "way":
+            for tag in elem.iter("tag"):
+                if is_phone_number(tag):
+                     audit_phone_number(phone_types, tag.attrib['v'])
+    return phone_types
+
+with bz2.BZ2File(io.BytesIO(r.content)) as osm_file:
+     phone_type=audit_phone(osm_file)
+
+with open("C://Users/Zohaib/Desktop/Lectures/Udacity/Phones.txt",'w') as f:
+    pprint.pprint(phone_type,f)
+
 mapping = { "Americas\n":"Americas",
             "Ave.":"Avenue",
             "ave":"Avenue",
@@ -190,9 +212,23 @@ def update_name(name, mapping):
         name=re.sub('(?<![a-zA-Z0-9])(?<=''){}(?!\.)(?![a-zA-Z0-9\-])'.format(i),mapping[i],name) #in the street names.
     return name                                                     #Uses the re.sub function to replace the street name
                                                                     #with all instances corrected.
-for st_type, ways in street_type.items():
-        for name in ways:
-            better_name = update_name(name, mapping)
+def update_phone(phone):
+    """Corrects all of the observed mistakes in phone numbers. Each of these mistakes is isolated into one change."""
+    phone=re.sub('(\+01)','',phone)
+    phone=re.sub('(\+1-)','',phone)
+    phone=re.sub('\.','',phone)
+    phone=re.sub('(\+1)','',phone)
+    phone=re.sub('\+','',phone)
+    phone=re.sub('(?<![0-9])1(?![0-9])','',phone)
+    phone=re.sub('\(','',phone)
+    phone=re.sub('\)','',phone)
+    phone=re.sub(' ','',phone)
+    if phone[3]!='-':
+        phone=phone[0:3]+'-'+phone[3:]
+    if phone[7]!='-':
+        phone=phone[0:7]+'-'+phone[7:]
+    phone
+    return phone
             
 NODES_PATH = "nodes.csv"
 NODE_TAGS_PATH = "nodes_tags.csv"
@@ -394,3 +430,16 @@ cursor.fetchall()[0][0]
 
 cursor.execute("select count(*) from way_tags where key LIKE 'highway';")
 cursor.fetchall()[0][0]
+
+cursor.execute("select sub1.value,sub1.count,sub2.count from\
+                (select value,count(*) as count from node_tags where key='cuisine' group by value) sub1 left join\
+                (select value,count(*) as count from way_tags where key='cuisine' group by value) sub2\
+                on sub1.value=sub2.value;")
+cuisine1=cursor.fetchall()
+cuisine={}
+for i in cuisine1:
+    if i[2]:
+        cuisine[i[0]]=i[1]+i[2]
+    else:
+        cuisine[i[0]]=i[1]
+sorted(cuisine.items(),key=lambda food: food[1],reverse=True)[0]

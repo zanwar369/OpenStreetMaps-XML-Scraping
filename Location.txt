@@ -1,3 +1,3 @@
 I have decided to scrape data for the New York Metro area from OpenStreetMaps.org. This is because I am a native New Yorker and have lived here for 24 years.
 I would love to delve into cleaning the details surrounding it as I would recognize how to clean it thoroughly. Furthermore, it is quite a large file
-so it is quite a challenge.
+so it was a challenge.
